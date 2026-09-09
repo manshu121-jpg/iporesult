@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPOResult - IPO Allotment Checker</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#eef2ff,#e0f2fe 45%,#f0fdf4);
+  min-height:100vh;color:#172033;
+}
+.header{
+  background:linear-gradient(135deg,#312e81,#2563eb,#0891b2);
+  color:white;padding:28px 20px 70px;text-align:center;
+}
+.logo{font-size:32px;font-weight:800;letter-spacing:.5px}
+.header p{margin:8px 0 0;opacity:.9}
+.container{max-width:520px;margin:-45px auto 30px;padding:0 18px}
+.card{
+  background:#fff;border-radius:22px;padding:28px;
+  box-shadow:0 15px 45px rgba(30,64,175,.16);
+}
+h1{margin:0 0 8px;font-size:27px}
+.sub{color:#667085;margin:0 0 22px}
+label{display:block;font-weight:700;margin:16px 0 7px}
+input,select,button{
+  width:100%;padding:14px;border-radius:11px;font-size:16px;
+}
+input,select{border:1px solid #cbd5e1;background:#f8fafc;outline:none}
+input:focus,select:focus{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}
+button{
+  border:0;background:linear-gradient(90deg,#2563eb,#4f46e5);
+  color:#fff;font-weight:700;margin-top:22px;cursor:pointer;
+  box-shadow:0 8px 18px rgba(37,99,235,.25);
+}
+button:hover{transform:translateY(-1px)}
+.privacy{
+  margin-top:20px;padding:14px;border-radius:12px;
+  background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;
+  font-size:13px;line-height:1.5;
+}
+.privacy strong{display:block;margin-bottom:4px}
+.result{display:none;margin-top:24px;padding-top:20px;border-top:1px solid #e5e7eb}
+.row{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid #f1f5f9}
+.badge{padding:6px 10px;border-radius:20px;background:#dcfce7;color:#166534}
+.footer{text-align:center;color:#64748b;font-size:12px;padding:0 20px 30px}
+.tracker{margin-top:18px;padding:16px;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0}
+.tracker-title{font-weight:800;margin-bottom:10px}
+.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tracker-stat{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;text-align:center}
+.tracker-number{font-size:24px;font-weight:800;color:#2563eb}
+.tracker-label{font-size:12px;color:#667085;margin-top:3px}
+.tracker-note{font-size:11px;color:#667085;line-height:1.45;margin-top:10px}
+@media(max-width:420px){.tracker-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">📈 IPOResult</div>
+  <p>Simple & Secure IPO Allotment Checker</p>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h1>Check IPO Allotment</h1>
+    <p class="sub">Enter your PAN and select an IPO to check your application.</p>
+
+    <label for="pan">PAN Number</label>
+    <input id="pan" type="text" maxlength="10" placeholder="ABCDE1234F" autocomplete="off">
+
+    <label for="ipo">Select IPO</label>
+    <select id="ipo">
+      <option value="">-- Select IPO --</option>
+      <option>Demo IPO 2026</option>
+      <option>Sample Technologies IPO</option>
+    </select>
+
+    <button onclick="checkAllotment()">🔍 Check Allotment</button>
+
+
+    <div class="tracker" aria-label="Website activity tracker">
+      <div class="tracker-title">📊 IPOResult Live Activity</div>
+      <div class="tracker-grid">
+        <div class="tracker-stat">
+          <div class="tracker-number" id="activeCheckers">—</div>
+          <div class="tracker-label">Currently checking</div>
+        </div>
+        <div class="tracker-stat">
+          <div class="tracker-number" id="totalVisitors">—</div>
+          <div class="tracker-label">Total visitors</div>
+        </div>
+      </div>
+      <div class="tracker-note">Live numbers will appear after a free analytics/database connection is configured. The demo page does not pretend that local browser counts are real visitor data.</div>
+    </div>
+
+    <div class="privacy">
+      <strong>🔒 Your PAN Privacy</strong>
+      Your PAN will <b>not be saved</b> unless you explicitly turn ON the
+      consent below. You can switch it OFF or delete the saved PAN anytime.
+    </div>
+
+    <div style="margin-top:14px;padding:15px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <strong>Save PAN on this device</strong>
+          <div style="font-size:12px;color:#667085;margin-top:4px">
+            Optional • Stored only in this browser
+          </div>
+        </div>
+        <label style="margin:0;position:relative;width:52px;height:30px;display:block">
+          <input id="savePan" type="checkbox"
+            onchange="toggleSaveConsent()"
+            style="opacity:0;width:0;height:0;position:absolute">
+          <span id="toggleTrack"
+            style="position:absolute;inset:0;border-radius:30px;background:#cbd5e1;cursor:pointer;transition:.2s">
+          </span>
+          <span id="toggleKnob"
+            style="position:absolute;width:24px;height:24px;left:3px;top:3px;background:white;border-radius:50%;box-shadow:0 2px 5px #94a3b8;transition:.2s">
+          </span>
+        </label>
+      </div>
+
+      <div id="savedPanBox" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">
+        <div style="font-size:13px;color:#475467;margin-bottom:8px">
+          Saved PAN: <strong id="savedPanText"></strong>
+        </div>
+        <button type="button" onclick="deleteSavedPan()"
+          style="margin:0;background:#dc2626;box-shadow:none;padding:10px">
+          🗑️ Delete Saved PAN
+        </button>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="row"><span>IPO</span><strong id="rIpo"></strong></div>
+      <div class="row"><span>PAN</span><strong id="rPan"></strong></div>
+      <div class="row"><span>Application</span><strong id="rApp"></strong></div>
+      <div class="row"><span>Shares Applied</span><strong id="rApplied"></strong></div>
+      <div class="row"><span>Shares Allotted</span><strong id="rAllotted"></strong></div>
+      <div class="row"><span>Status</span><strong class="badge" id="rStatus"></strong></div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:18px 0 8px;font-size:13px">
+  <a href="privacy-policy.html" style="color:#2563eb;text-decoration:none;font-weight:600">Privacy Policy</a>
+  &nbsp;•&nbsp;
+  <a href="terms-and-conditions.html" style="color:#2563eb;text-decoration:none;font-weight:600">Terms & Conditions</a>
+</div>
+
+<div style="text-align:center;margin:0 0 18px;font-size:12px;color:#667085">
+  By using IPOCheck, you acknowledge that you have read and agree to the
+  <a href="terms-and-conditions.html" style="color:#2563eb">Terms & Conditions</a>
+  and <a href="privacy-policy.html" style="color:#2563eb">Privacy Policy</a>.
+</div>
+
+<div class="footer">
+  IPOCheck Demo • Privacy-first design • Real registrar integration required for live results
+</div>
+
+<script>
+function updateSavedPanUI(){
+  const saved=localStorage.getItem("ipoCheckSavedPan");
+  const box=document.getElementById("savedPanBox");
+  const text=document.getElementById("savedPanText");
+  const checkbox=document.getElementById("savePan");
+  const track=document.getElementById("toggleTrack");
+  const knob=document.getElementById("toggleKnob");
+
+  if(saved){
+    box.style.display="block";
+    text.textContent=saved.slice(0,5) + "•••••";
+    checkbox.checked=true;
+    track.style.background="#2563eb";
+    knob.style.left="25px";
+  }else{
+    box.style.display="none";
+    checkbox.checked=false;
+    track.style.background="#cbd5e1";
+    knob.style.left="3px";
+  }
+}
+
+function toggleSaveConsent(){
+  const checkbox=document.getElementById("savePan");
+  const pan=document.getElementById("pan").value.trim().toUpperCase();
+
+  if(checkbox.checked){
+    if(!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)){
+      checkbox.checked=false;
+      alert("First enter a valid PAN, then turn ON Save PAN.");
+      updateSavedPanUI();
+      return;
+    }
+    const confirmed=confirm("Do you allow IPOCheck to save your PAN on this device/browser?");
+    if(!confirmed){
+      checkbox.checked=false;
+      updateSavedPanUI();
+      return;
+    }
+    localStorage.setItem("ipoCheckSavedPan", pan);
+  }else{
+    localStorage.removeItem("ipoCheckSavedPan");
+  }
+  updateSavedPanUI();
+}
+
+function deleteSavedPan(){
+  localStorage.removeItem("ipoCheckSavedPan");
+  document.getElementById("pan").value="";
+  updateSavedPanUI();
+  alert("Saved PAN has been deleted from this browser.");
+}
+
+function checkAllotment(){
+  const pan=document.getElementById("pan").value.trim().toUpperCase();
+  const ipo=document.getElementById("ipo").value;
+
+  if(!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)){
+    alert("Please enter a valid PAN format, e.g. ABCDE1234F");
+    return;
+  }
+  if(!ipo){
+    alert("Please select an IPO");
+    return;
+  }
+
+  // If consent is ON, save the entered PAN locally in this browser.
+  if(document.getElementById("savePan").checked){
+    localStorage.setItem("ipoCheckSavedPan", pan);
+    updateSavedPanUI();
+  }
+
+  // Demo only — this does NOT represent a real allotment.
+  const lastDigit=parseInt(pan.charAt(8),10);
+  const allotted=lastDigit % 2 === 0 ? 1 : 0;
+
+  document.getElementById("rIpo").textContent=ipo;
+  document.getElementById("rPan").textContent=pan;
+  document.getElementById("rApp").textContent="DEMO-" + pan.slice(-4);
+  document.getElementById("rApplied").textContent="1 Lot";
+  document.getElementById("rAllotted").textContent=allotted + " Lot";
+  document.getElementById("rStatus").textContent=allotted ? "Allotted" : "Not Allotted";
+  document.getElementById("result").style.display="block";
+}
+
+window.addEventListener("DOMContentLoaded", function(){
+  const saved=localStorage.getItem("ipoCheckSavedPan");
+  if(saved) document.getElementById("pan").value=saved;
+  updateSavedPanUI();
+});
+
+
+// IPOResult visitor tracker
+// GitHub Pages is static, so real cross-user counts require an external analytics/backend service.
+// Once connected, update these two elements from the service:
+// document.getElementById("activeCheckers").textContent = activeCount;
+// document.getElementById("totalVisitors").textContent = totalVisitors;
+function registerTrackerActivity(){
+  // UI only until a backend is configured.
+  const active=document.getElementById("activeCheckers");
+  const total=document.getElementById("totalVisitors");
+  if(active) active.textContent="—";
+  if(total) total.textContent="—";
+}
+
+registerTrackerActivity();
+</script>
+</body>
+</html>
