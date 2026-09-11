@@ -1,283 +1,121 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPOResult - IPO Allotment Checker</title><meta name="description" content="Check IPO allotment status using PAN number.">
-<style>*{  box-sizing:border-box;}
-body{  margin:0;  font-family:Arial,sans-serif;  background:linear-gradient(135deg,#eef2ff,#e0f2fe 45%,#f0fdf4);  min-height:100vh;  color:#172033;}
-.header{  background:linear-gradient(135deg,#312e81,#2563eb,#0891b2);  color:white;  padding:30px 20px 75px;  text-align:center;}
-.logo{  font-size:34px;  font-weight:800;}
-.header p{  margin:8px 0 0;  opacity:.92;}
-.container{  max-width:540px;  margin:-48px auto 30px;  padding:0 18px;}
-.card{  background:white;  border-radius:22px;  padding:28px;  box-shadow:0 15px 45px rgba(30,64,175,.16);}
-h1{  margin:0 0 8px;  font-size:27px;}
-.sub{  color:#667085;  margin:0 0 22px;  line-height:1.5;}
-label{  display:block;  font-weight:700;  margin:16px 0 7px;}
-input,select,button{  width:100%;  padding:14px;  border-radius:11px;  font-size:16px;}
-input,select{  border:1px solid #cbd5e1;  background:#f8fafc;  outline:none;}
-input:focus,select:focus{  border-color:#2563eb;  box-shadow:0 0 0 3px #dbeafe;}
-button{  border:0;  background:linear-gradient(90deg,#2563eb,#4f46e5);  color:white;  font-weight:700;  margin-top:22px;  cursor:pointer;  box-shadow:0 8px 18px rgba(37,99,235,.25);}
-button:disabled{  opacity:.65;  cursor:not-allowed;}
-.message{  display:none;  margin-top:18px;  padding:14px;  border-radius:12px;  line-height:1.5;  font-size:14px;}
-.message.error{  display:block;  background:#fef2f2;  border:1px solid #fecaca;  color:#991b1b;}
-.message.info{  display:block;  background:#eff6ff;  border:1px solid #bfdbfe;  color:#1e40af;}
-.message.success{  display:block;  background:#f0fdf4;  border:1px solid #bbf7d0;  color:#166534;}
-.result{  display:none;  margin-top:24px;  padding-top:20px;  border-top:1px solid #e5e7eb;}
-.row{  display:flex;  justify-content:space-between;  gap:15px;  padding:12px 0;  border-bottom:1px solid #f1f5f9;}
-.row span:first-child{  color:#667085;}
-.badge{  padding:6px 10px;  border-radius:20px;  font-size:13px;}
-.allotted{  background:#dcfce7;  color:#166534;}
-.not-allotted{  background:#fee2e2;  color:#991b1b;}
-.pending{  background:#fef3c7;  color:#92400e;}
-.tracker{  margin-top:20px;  padding:16px;  border-radius:14px;  background:#f8fafc;  border:1px solid #e2e8f0;}
-.tracker-title{  font-weight:800;  margin-bottom:10px;}
-.tracker-grid{  display:grid;  grid-template-columns:1fr 1fr;  gap:10px;}
-.tracker-stat{  background:white;  border:1px solid #e5e7eb;  border-radius:12px;  padding:12px;  text-align:center;}
-.tracker-number{  font-size:24px;  font-weight:800;  color:#2563eb;}
-.tracker-label{  font-size:12px;  color:#667085;  margin-top:3px;}
-.privacy{  margin-top:20px;  padding:14px;  border-radius:12px;  background:#eff6ff;  border:1px solid #bfdbfe;  color:#1e40af;  font-size:13px;  line-height:1.5;}
-.privacy strong{  display:block;  margin-bottom:4px;}
-.footer{  text-align:center;  color:#64748b;  font-size:12px;  padding:0 20px 30px;}
-.links{  text-align:center;  margin:18px 0;  font-size:13px;}
-.links a{  color:#2563eb;  text-decoration:none;  font-weight:600;}
-.loading{  display:none;  text-align:center;  margin-top:18px;  color:#475467;}
-.spinner{  display:inline-block;  width:20px;  height:20px;  border:3px solid #dbeafe;  border-top-color:#2563eb;  border-radius:50%;  animation:spin .8s linear infinite;  vertical-align:middle;  margin-right:7px;}
-@keyframes spin{  to{transform:rotate(360deg)}}
-@media(max-width:420px){  .tracker-grid{    grid-template-columns:1fr;  }
-  .card{    padding:22px;  }
-  h1{    font-size:24px;  }}</style></head>
+<!DOCTYPE html><html lang="en"><head>  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPOResult - IPO Allotment Checker</title>
+  <meta    name="description"    content="Check IPO allotment status using your application ID."  >
+  <style>    * {      box-sizing: border-box;    }
+    body {      margin: 0;      font-family: Arial, sans-serif;      background: linear-gradient(        135deg,        #eef2ff,        #e0f2fe 45%,        #f0fdf4      );      min-height: 100vh;      color: #172033;    }
+    .header {      background: linear-gradient(        135deg,        #312e81,        #2563eb,        #0891b2      );      color: white;      padding: 30px 20px 75px;      text-align: center;    }
+    .logo {      font-size: 34px;      font-weight: 800;      letter-spacing: 0.5px;    }
+    .header p {      margin: 8px 0 0;      opacity: 0.92;    }
+    .container {      max-width: 540px;      margin: -48px auto 30px;      padding: 0 18px;    }
+    .card {      background: white;      border-radius: 22px;      padding: 28px;      box-shadow: 0 15px 45px rgba(30, 64, 175, 0.16);    }
+    h1 {      margin: 0 0 8px;      font-size: 27px;    }
+    .sub {      color: #667085;      margin: 0 0 22px;      line-height: 1.5;    }
+    label {      display: block;      font-weight: 700;      margin: 16px 0 7px;    }
+    input,    select,    button {      width: 100%;      padding: 14px;      border-radius: 11px;      font-size: 16px;    }
+    input,    select {      border: 1px solid #cbd5e1;      background: #f8fafc;      outline: none;    }
+    input:focus,    select:focus {      border-color: #2563eb;      box-shadow: 0 0 0 3px #dbeafe;    }
+    button {      border: 0;      background: linear-gradient(        90deg,        #2563eb,        #4f46e5      );      color: white;      font-weight: 700;      margin-top: 22px;      cursor: pointer;      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);      transition: 0.2s;    }
+    button:hover {      transform: translateY(-1px);    }
+    button:disabled {      opacity: 0.65;      cursor: not-allowed;      transform: none;    }
+    .loading {      display: none;      text-align: center;      margin-top: 18px;      color: #475467;    }
+    .spinner {      display: inline-block;      width: 20px;      height: 20px;      border: 3px solid #dbeafe;      border-top-color: #2563eb;      border-radius: 50%;      animation: spin 0.8s linear infinite;      vertical-align: middle;      margin-right: 7px;    }
+    @keyframes spin {      to {        transform: rotate(360deg);      }    }
+    .message {      display: none;      margin-top: 18px;      padding: 14px;      border-radius: 12px;      line-height: 1.5;      font-size: 14px;    }
+    .message.error {      display: block;      background: #fef2f2;      border: 1px solid #fecaca;      color: #991b1b;    }
+    .message.info {      display: block;      background: #eff6ff;      border: 1px solid #bfdbfe;      color: #1e40af;    }
+    .message.success {      display: block;      background: #f0fdf4;      border: 1px solid #bbf7d0;      color: #166534;    }
+    .result {      display: none;      margin-top: 24px;      padding-top: 20px;      border-top: 1px solid #e5e7eb;    }
+    .row {      display: flex;      justify-content: space-between;      align-items: center;      gap: 15px;      padding: 12px 0;      border-bottom: 1px solid #f1f5f9;    }
+    .row span:first-child {      color: #667085;    }
+    .badge {      padding: 6px 10px;      border-radius: 20px;      font-size: 13px;    }
+    .allotted {      background: #dcfce7;      color: #166534;    }
+    .not-allotted {      background: #fee2e2;      color: #991b1b;    }
+    .pending {      background: #fef3c7;      color: #92400e;    }
+    .tracker {      margin-top: 20px;      padding: 16px;      border-radius: 14px;      background: #f8fafc;      border: 1px solid #e2e8f0;    }
+    .tracker-title {      font-weight: 800;      margin-bottom: 10px;    }
+    .tracker-grid {      display: grid;      grid-template-columns: 1fr 1fr;      gap: 10px;    }
+    .tracker-stat {      background: white;      border: 1px solid #e5e7eb;      border-radius: 12px;      padding: 12px;      text-align: center;    }
+    .tracker-number {      font-size: 24px;      font-weight: 800;      color: #2563eb;    }
+    .tracker-label {      font-size: 12px;      color: #667085;      margin-top: 3px;    }
+    .privacy {      margin-top: 20px;      padding: 14px;      border-radius: 12px;      background: #eff6ff;      border: 1px solid #bfdbfe;      color: #1e40af;      font-size: 13px;      line-height: 1.5;    }
+    .privacy strong {      display: block;      margin-bottom: 4px;    }
+    .links {      text-align: center;      margin: 18px 0;      font-size: 13px;    }
+    .links a {      color: #2563eb;      text-decoration: none;      font-weight: 600;    }
+    .footer {      text-align: center;      color: #64748b;      font-size: 12px;      line-height: 1.6;      padding: 0 20px 30px;    }
+    .note {      margin-top: 14px;      font-size: 12px;      color: #667085;      line-height: 1.5;    }
+    @media (max-width: 420px) {      .tracker-grid {        grid-template-columns: 1fr;      }
+      .card {        padding: 22px;      }
+      h1 {        font-size: 24px;      }
+      .logo {        font-size: 30px;      }    }  </style></head>
 <body>
-<header class="header">  <div class="logo"> IPOResult</div>  <p>Simple & Secure IPO Allotment Checker</p></header>
-<main class="container">
-  <div class="card">
-    <h1>Check IPO Allotment</h1>
-    <p class="sub">      Enter your PAN number and select an IPO to check your allotment status.    </p>
-    <label for="pan">PAN Number</label>
-    <input      id="pan"      type="text"      maxlength="10"      placeholder="ABCDE1234F"      autocomplete="off"      autocapitalize="characters"    >
-    <label for="ipo">Select IPO</label>
-    <select id="ipo">      <option value="">-- Select IPO --</option>    </select>
-    <button id="checkButton" onclick="checkAllotment()">      Check Allotment    </button>
-    <div class="loading" id="loading">      <span class="spinner"></span>      Checking allotment...    </div>
-    <div id="message" class="message"></div>
-    <div class="result" id="result">
-      <div class="row">        <span>IPO</span>        <strong id="rIpo">-</strong>      </div>
-      <div class="row">        <span>PAN</span>        <strong id="rPan">-</strong>      </div>
-      <div class="row">        <span>Application</span>        <strong id="rApp">-</strong>      </div>
-      <div class="row">        <span>Shares Applied</span>        <strong id="rApplied">-</strong>      </div>
-      <div class="row">        <span>Shares Allotted</span>        <strong id="rAllotted">-</strong>      </div>
-      <div class="row">        <span>Status</span>        <strong class="badge" id="rStatus">-</strong>      </div>
-    </div>
-    <div class="tracker">
-      <div class="tracker-title">        IPOResult Activity      </div>
-      <div class="tracker-grid">
-        <div class="tracker-stat">          <div class="tracker-number" id="activeCheckers">—</div>          <div class="tracker-label">            Currently checking          </div>        </div>
-        <div class="tracker-stat">          <div class="tracker-number" id="totalVisitors">—</div>          <div class="tracker-label">            Total visitors          </div>        </div>
+  <!-- HEADER -->  <header class="header">    <div class="logo"> IPOResult</div>    <p>Simple & Secure IPO Allotment Checker</p>  </header>
+
+  <!-- MAIN -->  <main class="container">
+    <div class="card">
+      <h1>Check IPO Allotment</h1>
+      <p class="sub">        Enter your Application ID and select an IPO to check        your allotment status.      </p>
+
+      <!-- APPLICATION ID -->      <label for="applicationId">        Application ID      </label>
+      <input        id="applicationId"        type="text"        maxlength="30"        placeholder="Enter Application ID"        autocomplete="off"        autocapitalize="characters"      >
+
+      <!-- IPO -->      <label for="ipo">        Select IPO      </label>
+      <select id="ipo">        <option value="">          -- Select IPO --        </option>
+        <!--          Live IPOs will be loaded from backend          when API is connected.        -->
+        <option value="example">          Example IPO        </option>      </select>
+
+      <!-- BUTTON -->      <button        id="checkButton"        onclick="checkAllotment()"      >        Check Allotment      </button>
+
+      <!-- LOADING -->      <div        class="loading"        id="loading"      >        <span class="spinner"></span>        Checking allotment...      </div>
+
+      <!-- MESSAGE -->      <div        id="message"        class="message"      ></div>
+
+      <!-- RESULT -->      <div        class="result"        id="result"      >
+        <div class="row">          <span>IPO</span>          <strong id="rIpo">-</strong>        </div>
+        <div class="row">          <span>Application ID</span>          <strong id="rApplication">-</strong>        </div>
+        <div class="row">          <span>Shares Applied</span>          <strong id="rApplied">-</strong>        </div>
+        <div class="row">          <span>Shares Allotted</span>          <strong id="rAllotted">-</strong>        </div>
+        <div class="row">          <span>Status</span>          <strong            class="badge"            id="rStatus"          >            -          </strong>        </div>
+      </div>
+
+      <!-- VISITOR TRACKER -->      <div class="tracker">
+        <div class="tracker-title">          IPOResult Live Activity        </div>
+        <div class="tracker-grid">
+          <div class="tracker-stat">
+            <div              class="tracker-number"              id="activeCheckers"            >              —            </div>
+            <div class="tracker-label">              Currently checking            </div>
+          </div>
+
+          <div class="tracker-stat">
+            <div              class="tracker-number"              id="totalVisitors"            >              —            </div>
+            <div class="tracker-label">              Total visitors            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->      <div class="privacy">
+        <strong>          Application Privacy        </strong>
+        Your Application ID is used only to request        allotment information from the configured service.        This page does not intentionally save your        Application ID in browser storage.
+      </div>
+
+      <div class="note">
+        Allotment results are shown only when verified        information is available from an authorised        registrar/data service.
       </div>
     </div>
-    <div class="privacy">
-      <strong> PAN Privacy</strong>
-      Your PAN is sent to the allotment service only when you      press the Check Allotment button. This website does not      intentionally store PAN numbers in browser local storage.
-    </div>
+  </main>
+
+  <!-- LINKS -->  <div class="links">
+    <a href="privacy-policy.html">      Privacy Policy    </a>
+    &nbsp;•&nbsp;
+    <a href="terms-and-conditions.html">      Terms & Conditions    </a>
   </div>
-</main>
-<div class="links">
-  <a href="privacy-policy.html">    Privacy Policy  </a>
-  &nbsp;•&nbsp;
-  <a href="terms-and-conditions.html">    Terms & Conditions  </a>
-</div>
-<div class="footer">
-  IPOResult • IPO Allotment Checker
-  <br><br>
-  Results are subject to availability of official registrar data.
-</div>
 
-<script>
-/*===========================================================IPOResult CONFIGURATION===========================================================
-IMPORTANT:
-GitHub Pages is a static hosting service.
-For REAL allotment checking, you need a backend/API.
-After your backend is ready, replace the value below.
-Example:
-const API_URL = "https://your-backend.com/api";
-Do NOT put private API keys in this file.===========================================================*/
-const API_URL = "";
+  <!-- FOOTER -->  <div class="footer">
+    IPOResult • IPO Allotment Checker
+    <br>
+    Results are subject to availability of official    registrar data.
+  </div>
 
-/*===========================================================LOAD IPO LIST===========================================================*/
-async function loadIPOs(){
-  const select = document.getElementById("ipo");
-  select.innerHTML =    '<option value="">Loading IPOs...</option>';
-  /*  If backend is connected, load IPOs from backend.  */
-  if(API_URL){
-    try{
-      const response = await fetch(        API_URL + "/ipos",        {          method:"GET",          headers:{            "Accept":"application/json"          }        }      );
-      if(!response.ok){        throw new Error("IPO API failed");      }
-      const data = await response.json();
-      select.innerHTML =        '<option value="">-- Select IPO --</option>';
-      if(Array.isArray(data.ipos)){
-        data.ipos.forEach(function(ipo){
-          const option =            document.createElement("option");
-          option.value = ipo.id;
-          option.textContent =            ipo.name;
-          select.appendChild(option);
-        });
-      }
-      return;
-    }catch(error){
-      console.error(error);
-    }
-  }
-
-  /*  Temporary list.
-  These are ONLY placeholders until  the backend supplies live IPO data.  */
-  select.innerHTML = `    <option value="">-- Select IPO --</option>    <option value="example">Example IPO</option>  `;
-}
-
-/*===========================================================PAN VALIDATION===========================================================*/
-function isValidPAN(pan){
-  return /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
-}
-
-/*===========================================================SHOW MESSAGE===========================================================*/
-function showMessage(text,type){
-  const box =    document.getElementById("message");
-  box.className =    "message " + type;
-  box.textContent =    text;
-}
-
-/*===========================================================HIDE MESSAGE===========================================================*/
-function hideMessage(){
-  const box =    document.getElementById("message");
-  box.className =    "message";
-  box.textContent =    "";
-}
-
-/*===========================================================CHECK ALLOTMENT===========================================================*/
-async function checkAllotment(){
-  const pan =    document.getElementById("pan")    .value    .trim()    .toUpperCase();
-  const ipo =    document.getElementById("ipo")    .value;
-  const button =    document.getElementById("checkButton");
-  const loading =    document.getElementById("loading");
-  const result =    document.getElementById("result");
-
-  result.style.display =    "none";
-  hideMessage();
-
-  /*  Validate PAN  */
-  if(!isValidPAN(pan)){
-    showMessage(      "Please enter a valid PAN number, for example ABCDE1234F.",      "error"    );
-    return;
-  }
-
-  /*  Validate IPO  */
-  if(!ipo){
-    showMessage(      "Please select an IPO.",      "error"    );
-    return;
-  }
-
-  /*  Do NOT generate fake/random results.  */
-  if(!API_URL){
-    showMessage(      "Real allotment checking is not connected yet. The website is live, but an official registrar/backend API is required before this site can return genuine allotment results.",      "info"    );
-    return;
-  }
-
-  /*  Start loading  */
-  button.disabled =    true;
-  loading.style.display =    "block";
-
-  try{
-    const response =      await fetch(        API_URL + "/allotment",        {          method:"POST",
-          headers:{            "Content-Type":              "application/json",
-            "Accept":              "application/json"          },
-          body:JSON.stringify({            pan:pan,            ipo:ipo          })        }      );
-
-    if(!response.ok){
-      throw new Error(        "Server returned " +        response.status      );
-    }
-
-    const data =      await response.json();
-
-    /*    Expected backend response:
-    {      "success": true,      "ipo": "ABC IPO",      "pan": "ABCDE1234F",      "application": "123456",      "sharesApplied": 10,      "sharesAllotted": 10,      "status": "Allotted"    }    */
-
-    if(!data.success){
-      showMessage(        data.message ||        "Allotment information could not be found.",        "error"      );
-      return;
-    }
-
-    displayResult(data);
-
-  }catch(error){
-    console.error(error);
-    showMessage(      "Unable to check the allotment right now. Please try again later.",      "error"    );
-  }finally{
-    button.disabled =      false;
-    loading.style.display =      "none";
-  }
-}
-
-/*===========================================================DISPLAY REAL RESULT===========================================================*/
-function displayResult(data){
-  document.getElementById("rIpo")    .textContent =    data.ipo || "-";
-
-  document.getElementById("rPan")    .textContent =    data.pan || "-";
-
-  document.getElementById("rApp")    .textContent =    data.application || "-";
-
-  document.getElementById("rApplied")    .textContent =    data.sharesApplied ?? "-";
-
-  document.getElementById("rAllotted")    .textContent =    data.sharesAllotted ?? "-";
-
-  const status =    document.getElementById("rStatus");
-
-  status.textContent =    data.status || "Unknown";
-
-  status.className =    "badge";
-
-  const statusText =    String(data.status || "")    .toLowerCase();
-
-  if(statusText.includes("allotted")){
-    status.classList.add(      "allotted"    );
-  }  else if(    statusText.includes("not")  ){
-    status.classList.add(      "not-allotted"    );
-  }  else{
-    status.classList.add(      "pending"    );
-  }
-
-  document.getElementById("result")    .style.display =    "block";
-}
-
-/*===========================================================VISITOR TRACKER===========================================================
-Real visitor numbers cannot be calculatedusing only local JavaScript.
-These values will be supplied by backendwhen available.===========================================================*/
-async function loadTracker(){
-  if(!API_URL){
-    document.getElementById(      "activeCheckers"    ).textContent = "—";
-    document.getElementById(      "totalVisitors"    ).textContent = "—";
-    return;
-  }
-
-  try{
-    const response =      await fetch(        API_URL + "/stats"      );
-
-    if(!response.ok)      throw new Error();
-
-    const data =      await response.json();
-
-    document.getElementById(      "activeCheckers"    ).textContent =      data.activeCheckers ?? "0";
-
-    document.getElementById(      "totalVisitors"    ).textContent =      data.totalVisitors ?? "0";
-
-  }catch(error){
-    console.error(      "Tracker error:",      error    );
-  }
-}
-
-/*===========================================================PAN INPUT===========================================================*/
-document  .getElementById("pan")  .addEventListener(    "input",    function(){
-      this.value =        this.value        .toUpperCase()        .replace(/[^A-Z0-9]/g,"")        .slice(0,10);
-    }  );
-
-/*===========================================================INITIALIZE===========================================================*/
-window.addEventListener(  "DOMContentLoaded",  function(){
-    loadIPOs();
-    loadTracker();
-  });
-</script>
-</body></html>
+  <script>
+    /*    ========================================================    API CONFIGURATION    ========================================================
+    GitHub Pages is static.
+    For REAL allotment results, connect this page    to your authorised
