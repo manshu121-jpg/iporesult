@@ -48,74 +48,204 @@
       h1 {        font-size: 24px;      }
       .logo {        font-size: 30px;      }    }  </style></head>
 <body>
-  <!-- HEADER -->  <header class="header">    <div class="logo"> IPOResult</div>    <p>Simple & Secure IPO Allotment Checker</p>  </header>
-
-  <!-- MAIN -->  <main class="container">
+  <header class="header">    <div class="logo">IPOResult</div>    <p>Simple & Secure IPO Allotment Checker</p>  </header>
+  <main class="container">
     <div class="card">
       <h1>Check IPO Allotment</h1>
       <p class="sub">        Enter your Application ID and select an IPO to check        your allotment status.      </p>
-
-      <!-- APPLICATION ID -->      <label for="applicationId">        Application ID      </label>
+      <label for="applicationId">        Application ID      </label>
       <input        id="applicationId"        type="text"        maxlength="30"        placeholder="Enter Application ID"        autocomplete="off"        autocapitalize="characters"      >
-
-      <!-- IPO -->      <label for="ipo">        Select IPO      </label>
+      <label for="ipo">        Select IPO      </label>
       <select id="ipo">        <option value="">          -- Select IPO --        </option>
-        <!--          Live IPOs will be loaded from backend          when API is connected.        -->
         <option value="example">          Example IPO        </option>      </select>
-
-      <!-- BUTTON -->      <button        id="checkButton"        onclick="checkAllotment()"      >        Check Allotment      </button>
-
-      <!-- LOADING -->      <div        class="loading"        id="loading"      >        <span class="spinner"></span>        Checking allotment...      </div>
-
-      <!-- MESSAGE -->      <div        id="message"        class="message"      ></div>
-
-      <!-- RESULT -->      <div        class="result"        id="result"      >
+      <button        id="checkButton"        onclick="checkAllotment()"      >        Check Allotment      </button>
+      <div        class="loading"        id="loading"      >        <span class="spinner"></span>        Checking allotment...      </div>
+      <div        id="message"        class="message"      ></div>
+      <div        class="result"        id="result"      >
         <div class="row">          <span>IPO</span>          <strong id="rIpo">-</strong>        </div>
         <div class="row">          <span>Application ID</span>          <strong id="rApplication">-</strong>        </div>
         <div class="row">          <span>Shares Applied</span>          <strong id="rApplied">-</strong>        </div>
         <div class="row">          <span>Shares Allotted</span>          <strong id="rAllotted">-</strong>        </div>
         <div class="row">          <span>Status</span>          <strong            class="badge"            id="rStatus"          >            -          </strong>        </div>
       </div>
-
-      <!-- VISITOR TRACKER -->      <div class="tracker">
+      <div class="tracker">
         <div class="tracker-title">          IPOResult Live Activity        </div>
         <div class="tracker-grid">
-          <div class="tracker-stat">
-            <div              class="tracker-number"              id="activeCheckers"            >              —            </div>
-            <div class="tracker-label">              Currently checking            </div>
-          </div>
-
-          <div class="tracker-stat">
-            <div              class="tracker-number"              id="totalVisitors"            >              —            </div>
-            <div class="tracker-label">              Total visitors            </div>
-          </div>
+          <div class="tracker-stat">            <div              class="tracker-number"              id="activeCheckers"            >              —            </div>
+            <div class="tracker-label">              Currently checking            </div>          </div>
+          <div class="tracker-stat">            <div              class="tracker-number"              id="totalVisitors"            >              —            </div>
+            <div class="tracker-label">              Total visitors            </div>          </div>
         </div>
       </div>
-
-      <!-- PRIVACY -->      <div class="privacy">
+      <div class="privacy">
         <strong>          Application Privacy        </strong>
         Your Application ID is used only to request        allotment information from the configured service.        This page does not intentionally save your        Application ID in browser storage.
       </div>
-
       <div class="note">
         Allotment results are shown only when verified        information is available from an authorised        registrar/data service.
       </div>
     </div>
   </main>
-
-  <!-- LINKS -->  <div class="links">
+  <div class="links">
     <a href="privacy-policy.html">      Privacy Policy    </a>
     &nbsp;•&nbsp;
     <a href="terms-and-conditions.html">      Terms & Conditions    </a>
   </div>
-
-  <!-- FOOTER -->  <div class="footer">
+  <div class="footer">
     IPOResult • IPO Allotment Checker
     <br>
     Results are subject to availability of official    registrar data.
   </div>
 
   <script>
-    /*    ========================================================    API CONFIGURATION    ========================================================
-    GitHub Pages is static.
-    For REAL allotment results, connect this page    to your authorised
+    /*      =====================================================      API CONFIGURATION      =====================================================
+      GitHub Pages is static.
+      Real allotment results require an authorised      backend/API.
+      Example:
+      const API_URL = "https://your-api.com";
+      Backend endpoints expected:
+      GET  /ipos
+      POST /allotment
+      GET  /stats    */
+    const API_URL = "";
+
+    /*      =====================================================      LOAD IPO LIST      =====================================================    */
+    async function loadIPOs() {
+      const ipoSelect = document.getElementById("ipo");
+      if (!API_URL) {        return;      }
+      try {
+        const response = await fetch(          API_URL + "/ipos"        );
+        if (!response.ok) {          throw new Error("Unable to load IPOs");        }
+        const ipos = await response.json();
+        ipoSelect.innerHTML =          '<option value="">-- Select IPO --</option>';
+        ipos.forEach(function (ipo) {
+          const option =            document.createElement("option");
+          option.value = ipo.id;          option.textContent = ipo.name;
+          ipoSelect.appendChild(option);
+        });
+      } catch (error) {
+        showMessage(          "Unable to load IPO list right now.",          "error"        );
+      }
+    }
+
+    /*      =====================================================      CHECK ALLOTMENT      =====================================================    */
+    async function checkAllotment() {
+      const applicationInput =        document.getElementById("applicationId");
+      const ipoSelect =        document.getElementById("ipo");
+      const button =        document.getElementById("checkButton");
+      const loading =        document.getElementById("loading");
+      const result =        document.getElementById("result");
+      const applicationId =        applicationInput.value          .trim()          .toUpperCase();
+      const ipo =        ipoSelect.value;
+
+      hideMessage();
+      result.style.display = "none";
+
+      /*        Validation      */
+      if (!applicationId) {
+        showMessage(          "Please enter your Application ID.",          "error"        );
+        applicationInput.focus();
+        return;      }
+
+      if (applicationId.length < 3) {
+        showMessage(          "Please enter a valid Application ID.",          "error"        );
+        applicationInput.focus();
+        return;      }
+
+      if (!ipo) {
+        showMessage(          "Please select an IPO.",          "error"        );
+        ipoSelect.focus();
+        return;      }
+
+      /*        API not connected      */
+      if (!API_URL) {
+        showMessage(          "Real allotment checking is not connected yet. An authorised registrar/data service API must be connected before this website can show actual allotment results.",          "info"        );
+        return;      }
+
+      /*        Start loading      */
+      button.disabled = true;
+      loading.style.display = "block";
+
+      try {
+        const response = await fetch(          API_URL + "/allotment",          {            method: "POST",
+            headers: {              "Content-Type": "application/json"            },
+            body: JSON.stringify({              applicationId: applicationId,              ipo: ipo            })          }        );
+
+        if (!response.ok) {          throw new Error(            "Unable to check allotment"          );        }
+
+        const data =          await response.json();
+
+        /*          Show result        */
+        document.getElementById("rIpo")          .textContent =          data.ipo || ipo;
+        document.getElementById("rApplication")          .textContent =          applicationId;
+        document.getElementById("rApplied")          .textContent =          data.sharesApplied ?? "-";
+        document.getElementById("rAllotted")          .textContent =          data.sharesAllotted ?? "-";
+
+        const statusElement =          document.getElementById("rStatus");
+
+        statusElement.textContent =          data.status || "Pending";
+
+        statusElement.className =          "badge";
+
+        const status =          String(            data.status || ""          ).toLowerCase();
+
+        if (          status.includes("allotted")        ) {
+          statusElement.classList.add(            "allotted"          );
+        } else if (          status.includes("not")        ) {
+          statusElement.classList.add(            "not-allotted"          );
+        } else {
+          statusElement.classList.add(            "pending"          );
+        }
+
+        result.style.display = "block";
+
+      } catch (error) {
+        showMessage(          "Unable to check allotment right now. Please try again later.",          "error"        );
+      } finally {
+        button.disabled = false;
+        loading.style.display = "none";
+      }
+    }
+
+    /*      =====================================================      MESSAGE      =====================================================    */
+    function showMessage(      text,      type    ) {
+      const message =        document.getElementById("message");
+      message.textContent = text;
+      message.className =        "message " + type;
+    }
+
+    function hideMessage() {
+      const message =        document.getElementById("message");
+      message.textContent = "";
+      message.className =        "message";
+    }
+
+    /*      =====================================================      LOAD VISITOR STATS      =====================================================    */
+    async function loadStats() {
+      if (!API_URL) {
+        document.getElementById(          "activeCheckers"        ).textContent = "—";
+        document.getElementById(          "totalVisitors"        ).textContent = "—";
+        return;      }
+
+      try {
+        const response =          await fetch(            API_URL + "/stats"          );
+
+        if (!response.ok) {          throw new Error(            "Stats unavailable"          );        }
+
+        const data =          await response.json();
+
+        document.getElementById(          "activeCheckers"        ).textContent =          data.activeCheckers ?? "0";
+
+        document.getElementById(          "totalVisitors"        ).textContent =          data.totalVisitors ?? "0";
+
+      } catch (error) {
+        document.getElementById(          "activeCheckers"        ).textContent = "—";
+        document.getElementById(          "totalVisitors"        ).textContent = "—";
+      }
+    }
+
+    /*      =====================================================      START      =====================================================    */
+    loadIPOs();
+    loadStats();
+  </script>
+</body></html>
